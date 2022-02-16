@@ -1,74 +1,69 @@
-<?php
-include('db.php');
-include('includes/header.php');
-?>
+<?php include("db.php"); ?>
 
+<?php include('includes/header.php'); ?>
 
-<div class="container pt-4">
-    <div class="row">
-        <div class="col-md-5">
-            <?php if (isset($_SESSION['message'])) { ?>
-                <div class="alert alert-<?php echo $_SESSION['message_type']; ?> alert-dismissible fade show" role="alert">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    <strong><?php echo $_SESSION['message']; ?></strong>
-                </div>
+<main class="container p-4">
+  <div class="row">
+    <div class="col-md-4">
+      <!-- MESSAGES -->
 
-                <script>
-                    var alertList = document.querySelectorAll('.alert');
-                    alertList.forEach(function(alert) {
-                        new bootstrap.Alert(alert)
-                    })
-                </script>
+      <?php if (isset($_SESSION['message'])) { ?>
+      <div class="alert alert-<?= $_SESSION['message_type']?> alert-dismissible fade show" role="alert">
+        <?= $_SESSION['message']?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <?php session_unset(); } ?>
 
-            <?php session_unset();
-            } ?>
-            <div class="card">
-                <div class="card-header">
-                    prueba
-                </div>
-                <div class="card-body">
-                    <form action="save_task.php" method="post" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="title">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Title">
-                        </div>
-                        <div class="form-group pb-4">
-                            <label for="description">Description</label>
-                            <textarea id="description" name="description" row="2" class="form-control" placeholder="description"></textarea>
-                        </div>
-                        <button type="submit" name="save_task" class="btn btn-primary">Save Task</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-7 overflow-auto">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Created</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $query = 'SELECT * FROM task;';
-                    $table = mysqli_query($conn, $query);
-                    while ($row = mysqli_fetch_array($table)){ 
-                    ?>
-                        <tr>
-                            <td><?php echo $row['title']; ?></td>
-                            <td><?php echo $row['description']; ?></td>
-                            <td><?php echo $row['created_at']; ?></td>
-                        </tr>
-                    <?php } ?>
-
-                </tbody>
-            </table>
-
-        </div>
+      <!-- ADD TASK FORM -->
+      <div class="card card-body">
+        <form action="save_task.php" method="POST">
+          <div class="form-group">
+            <input type="text" name="title" class="form-control" placeholder="Task Title" autofocus>
+          </div>
+          <div class="form-group">
+            <textarea name="description" rows="2" class="form-control" placeholder="Task Description"></textarea>
+          </div>
+          <input type="submit" name="save_task" class="btn btn-success btn-block" value="Save Task">
+        </form>
+      </div>
     </div>
-</div>
+    <div class="col-md-8">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Created At</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <?php
+          $query = "SELECT * FROM task";
+          $result_tasks = mysqli_query($conn, $query);    
+
+          while($row = mysqli_fetch_assoc($result_tasks)) { ?>
+          <tr>
+            <td><?php echo $row['title']; ?></td>
+            <td><?php echo $row['description']; ?></td>
+            <td><?php echo $row['created_at']; ?></td>
+            <td>
+              <a href="edit.php?id=<?php echo $row['id']?>" class="btn btn-secondary">
+                <i class="fas fa-marker"></i>
+              </a>
+              <a href="delete_task.php?id=<?php echo $row['id']?>" class="btn btn-danger">
+                <i class="far fa-trash-alt"></i>
+              </a>
+            </td>
+          </tr>
+          <?php } ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
 
 <?php include('includes/footer.php'); ?>
